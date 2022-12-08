@@ -9,10 +9,15 @@ const Header = () => {
     navigation.replace("UserAccount")
   }
 
+  const handleSearch = () => {
+    navigation.replace("SpotifySearch")
+  }
+
   return (
     <View style={styles.container}>
          <View style={styles.iconsContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSearch}>
             <Image
                 source={{
                     uri: 'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-friends-user-tanah-basah-basic-outline-tanah-basah.png'

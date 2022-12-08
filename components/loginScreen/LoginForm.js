@@ -1,5 +1,5 @@
 import { View, TextInput, StyleSheet, Text, Pressable, TouchableOpacity, Alert } from 'react-native'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { Formik } from 'formik'
 import { authentication } from '../../firebase';
 import * as Yup from 'yup';
@@ -23,6 +23,16 @@ const LoginForm = ({navigation}) => {
             Alert.alert(error.message)
         }
     }
+
+    useEffect(() => {
+        const unsubscribe = authentication.onAuthStateChanged(user => {
+           if (user) {
+             navigation.replace("Home")
+           }
+         })
+     
+         return unsubscribe
+       }, [])
   return (
     <View style={styles.wrapper} >
 

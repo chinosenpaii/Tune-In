@@ -1,5 +1,5 @@
 import { View, TextInput, StyleSheet, Text, Pressable, TouchableOpacity } from 'react-native'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { Formik } from 'formik'
 import * as  Yup from 'yup'
 import Validator from 'email-validator'
@@ -23,6 +23,7 @@ const SignupForm = ({navigation}) => {
         const data = await response.json()
         return data.results[0].picture.large
     }
+    
 
     const onSignup = async (email, password, username) => {
         try {
@@ -48,6 +49,16 @@ const SignupForm = ({navigation}) => {
         }
     }
 
+    useEffect(() => {
+        const unsubscribe = authentication.onAuthStateChanged(user => {
+           if (user) {
+             navigation.replace("Home")
+           }
+         })
+     
+         return unsubscribe
+       }, [])
+       
     return (
         <View style={styles.wrapper} >
     
