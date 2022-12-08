@@ -1,7 +1,7 @@
-import { View, Text, Image, FlatList, SafeAreaView, Button, StyleSheet, EventEmitter } from 'react-native'
+import { View, Text, Image, FlatList, SafeAreaView, FormControl, Button, StyleSheet, EventEmitter } from 'react-native'
 import { SearchBar } from 'react-native-elements';
 import React, { useState, useEffect } from 'react'
-import { Container, FormControl, InputGroup} from 'react-bootstrap'
+import { Container, Form} from 'react-bootstrap'
 import TrackSearchResults from '../data/TrackSearchResults';
 
 //import { async } from '@firebase/util';
@@ -55,32 +55,27 @@ const SpotifySearch = () => {
 
     }
 return(
-    <div className="App">
-        <Container>
-            <InputGroup className="mb-3" size="lg">
-                <FormControl
-                placeholder='Search Songs/Artists'
-                type="Input"
-                //value={searchInput}
-                onKeyPress={event => {
-                    if (event.key == 'Enter') {
-                        search()
-                    }
-                }}
-                onChange={event => setSearchInput(event.target.value)}
-                />
-               
-               {albums.map((album, i) => {
-                    console.log(album);
-                    return (
-                    <Image src={album.images[0].url}/>
-                        )
-                })}
-                
-                
-            </InputGroup>
-        </Container>
-    </div>
+    <View style={styles.container}>
+        <SearchBar
+        placeholder='Search Songs/Artists'
+        value={searchInput}
+        onKeyPress={event => {
+            if (event.key == 'Enter') {
+                search()
+            }
+        }}
+        
+        />
+       
+        {albums.map((album, i) => {
+            console.log(album);
+            return (
+            <Image src={album.images[0].url}/>
+                )
+        })}
+
+     
+    </View>
 )
 
         
