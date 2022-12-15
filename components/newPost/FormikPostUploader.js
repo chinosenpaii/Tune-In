@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
 import { Divider } from 'react-native-elements'
-import { authentication } from '../../firebase'
+import { authentication, db } from '../../firebase'
+import { collection, onSnapshot, limit, query, addDoc, where } from 'firebase/firestore'
 
 const PLACEHOLDER_IMG = 'https://www.brownweinraub.com/wp-content/uploads/2017/09/placeholder.jpg'
 
@@ -15,6 +16,18 @@ const uploadPostSchema = Yup.object().shape({
 const FormikPostUploader = () => {
     const [thumbnailUrl, setThumbnailUrl] = useState(PLACEHOLDER_IMG)
     const [currentLoggedInUser, setCurrentLoggedInUser] = useState(null)
+
+    const getUsername = () => {
+        const user = authentication.currentUser
+        const q = query(collection(db, 'users'), where('owner_id', '==', user.uid), limit(1));
+        const unsubscribe = onSnapshot(q, (snapshot) => snapshot.docs.map(doc => {
+            setCurrentLoggedInUser({
+                username: doc.data().username,
+                profilePicture: doc.data().profile_picture
+            })
+        }))
+        return unsubscribe
+    }
 
     /* const getUsername = () => {
         const user = authentication.currentUser
@@ -29,18 +42,24 @@ const FormikPostUploader = () => {
         return unsubscribe
     } */
 
-    /* const q = query(collection(db, "users"), where("owner_id", "==", user.uid), limit(1));
-       const unsubscribe = onSnapshot(snapshot => snapshot.docs.map(doc => {
-           setCurrentLoggedInUser({
-               username: doct.data().username,
-               profilePicture: doc.data().profile_picture
-           })*/
+      /*const getUsername = () => {
+          const user = authentication.currentUser
+          const q = query(collection(db, "users"), where("owner_id", "==", user.uid), limit(1));
+          const unsubscribe = onSnapshot(snapshot => snapshot.docs.map(doc => {
+              setCurrentLoggedInUser({
+                  username: doc.data().username,
+                  profilePicture: doc.data().profile_picture
+                })
+            }
+        } */
+    
+        
 
-    /*useEffect(() => {
+    useEffect(() => {
         getUsername()
     }, [])
 
-    const uploadPostToFirebase = (imageUrl, caption) => {
+    /*const uploadPostToFirebase = (imageUrl, caption) => {
         const unsubscribe = db
         .collection('users')
         .doc(firebase.auth().currentUser.email)
@@ -61,8 +80,24 @@ const FormikPostUploader = () => {
     return unsubscribe
     } */
 
-    /* const unsubscribe = await addDoc(collection(db, 'users'*/
-  return (
+    const uploadPostToFirebase = (imageUrl, caption) => { 
+        const unsubscribe = addDoc(collection(db, 'users', authentication.currentUser.email, 'posts'), {
+            imageUrl: imageUrl,
+            user: currentLoggedInUser.username,
+            profile_picture: currentLoggedInUser.profilePicture,
+            owner_uid: authentication.currentUser.uid,
+            caption: caption,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            likes: 0,
+            likes_by_users: [],
+            comments: []
+        })
+        .then(() => navigation.goBack())
+
+    return unsubscribe
+    }
+  
+    return (
     <Formik initialValues={{caption: '', imageUrl: ''}} onSubmit={values => {uploadPostToFirebase(values.imageUrl, values.caption)}} validatonSchema={uploadPostSchema}
         validateOnMount={true} >
         {({ handleBlur, handleChange, handleSubmit, values, errors, isValid }) => (

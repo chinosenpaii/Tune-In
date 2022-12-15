@@ -7,22 +7,23 @@ import { ScrollView } from 'react-native'
 import {POSTS } from '../data/posts'
 import Bottom from '../components/home/Bottom'
 import { db } from '../firebase'
+import { onSnapshot, orderBy, collectionGroup, query } from 'firebase/firestore'
 
 const HomeScreen = () => {
     const [posts, setPosts] = useState([])
 
-    /*useEffect(() => {
-        db.collectionGroup('posts')
-            .orderBy('createdAt', 'desc')
-            .onSnapshot(snapshot => { 
-                setPosts(snapshot.docs.map(post => ({ id: post.id, ...post.data() })))
-            })
-    }, []) */
+    useEffect(() => {
+        const post = collectionGroup(db, 'posts')
+        const postQuery = query(post)
+        onSnapshot(postQuery, (snapshot) => {setPosts(snapshot.docs.map(doc => doc.data()))
+        })
+    }, []) 
+
   return (
     <SafeAreaView style={styles.container}>
         <Header />
         <ScrollView>
-            {POSTS.map((post, index) => (
+            {posts.map((post, index) => (
                 <Post post={post} key={index} />
             ))}
         </ScrollView>
